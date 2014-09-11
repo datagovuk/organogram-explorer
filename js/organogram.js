@@ -2909,7 +2909,7 @@ function sort_prop() {
 }
 function sortByLabel(){
 	return function (a,b) {
-        return (a.label[0].toLowerCase() < b.label[0].toLowerCase()) ? -1 : (a.label[0].toLowerCase() > b.label[0].toLowerCase()) ? 1 : 0;
+        return (a.label[0]._value.toLowerCase() < b.label[0]._value.toLowerCase()) ? -1 : (a.label[0]._value.toLowerCase() > b.label[0]._value.toLowerCase()) ? 1 : 0;
     }
 }
 // fn to handle jsonp with timeouts and errors
