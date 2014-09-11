@@ -2090,17 +2090,17 @@ var Orgvis = {
 			var pSlug,gSlug,uSlug;
 						
 			if(typeof items[i].withProfession != 'undefined'){
-				pSlug = Orgvis.getSlug(items[i].withProfession._about);
+				pSlug = Orgvis.getSlug(items[i].withProfession);
 			} else {
 				pSlug = "other";
 			}
 			if(typeof items[i].atGrade != 'undefined'){
-				gSlug = Orgvis.getSlug(items[i].atGrade._about);
+				gSlug = Orgvis.getSlug(items[i].atGrade);
 			} else {
 				gSlug = "other";
 			}			
 			if(typeof items[i].inUnit != 'undefined'){
-				uSlug = Orgvis.getSlug(items[i].inUnit._about);
+				uSlug = Orgvis.getSlug(items[i].inUnit);
 			} else {
 				uSlug = "other";
 			}			
