@@ -64,7 +64,7 @@ var Orgvis = {
 		firstLoad_expectedApiResponses:4, // Used to make the app wait until the correct number of API responses have been gathered
 		apiResponses:[],		// Stores JSON responses from the API
 		cacheObj:{},			// An object to store API responses
-		debug:false,				// Output to console or not
+		debug:true ,				// Output to console or not
 		fakeTop: {
 			"_about": "http:\/\/reference.data.gov.uk\/id\/department\/top\/post\/top",
 			"label": ["Top Post"],
@@ -158,9 +158,12 @@ var Orgvis = {
 			log("Not in preview mode");
 			// Not in preview mode
 			//Orgvis.vars.apiBase = "reference.data.gov.uk";
-			Orgvis.vars.apiBase = document.domain + "/" + strDateFolder; 
+			Orgvis.vars.apiBase = document.domain + "/" + strDateFolder;
+            Orgvis.vars.apiBase = "reference.data.gov.uk" + "/" + strDateFolder;
+            Orgvis.vars.apiBase = "localhost:8880" + "/" + strDateFolder;
 			Orgvis.initSpaceTree(reload);
-		}	
+		}
+
 		
 		Orgvis.loadSlider(versionsList);
 		Orgvis.showSignOff();
@@ -1693,7 +1696,7 @@ var Orgvis = {
 					person.foafName = p.name;
 				}
 				if(typeof p.phone != 'undefined'){
-					person.foafPhone = p.phone.label[0];
+					person.foafPhone = p.phone;
 				}
 				if(typeof p.email != 'undefined'){
 					person.foafMbox = p.email.label[0];
