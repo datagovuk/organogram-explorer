@@ -2095,12 +2095,12 @@ var Orgvis = {
 				pSlug = "other";
 			}
 			if(typeof items[i].atGrade != 'undefined'){
-				gSlug = Orgvis.getSlug(items[i].atGrade);
+				gSlug = Orgvis.getSlug(items[i].atGrade._about);
 			} else {
 				gSlug = "other";
 			}			
 			if(typeof items[i].inUnit != 'undefined'){
-				uSlug = Orgvis.getSlug(items[i].inUnit);
+				uSlug = Orgvis.getSlug(items[i].inUnit._about);
 			} else {
 				uSlug = "other";
 			}			
