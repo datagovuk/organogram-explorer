@@ -64,7 +64,7 @@ var Orgvis = {
 		firstLoad_expectedApiResponses:4, // Used to make the app wait until the correct number of API responses have been gathered
 		apiResponses:[],		// Stores JSON responses from the API
 		cacheObj:{},			// An object to store API responses
-		debug:true ,				// Output to console or not
+		debug:false,				// Output to console or not
 		fakeTop: {
 			"_about": "http:\/\/reference.data.gov.uk\/id\/department\/top\/post\/top",
 			"label": ["Top Post"],
@@ -159,11 +159,9 @@ var Orgvis = {
 			// Not in preview mode
 			//Orgvis.vars.apiBase = "reference.data.gov.uk";
 			Orgvis.vars.apiBase = document.domain + "/" + strDateFolder;
-            Orgvis.vars.apiBase = "reference.data.gov.uk" + "/" + strDateFolder;
-            Orgvis.vars.apiBase = "localhost:8880" + "/" + strDateFolder;
+            Orgvis.vars.apiBase = "localhost:8880/" + strDateFolder;
 			Orgvis.initSpaceTree(reload);
-		}
-
+		}	
 		
 		Orgvis.loadSlider(versionsList);
 		Orgvis.showSignOff();
@@ -352,7 +350,8 @@ var Orgvis = {
 						var pi=node.data.postIn;			
 						for(var a=pi.length;a--;){
 							if(pi[a]._about.indexOf("/unit/") > 0 && label.innerHTML.indexOf('childLoader') < 0){
-								label.innerHTML = label.innerHTML + '<span class="postIn ui-state-active">'+pi[a].label[0]+'</span><span class="childLoader"><img src="../images/childLoader.gif" /></span>';
+								label.innerHTML = label.innerHTML + '<span class="postIn ui-state-active">'+Orgvis.getValue(pi[a].label)+'</span><span class="childLoader"><img src="' +
+                                    'images/childLoader.gif" /></span>';
 							} else {}
 						}
 					} else {
@@ -369,7 +368,7 @@ var Orgvis = {
 					$(label).addClass('juniorPost');
 					$(label).addClass(node.data.nodeType);
 											
-					label.innerHTML = node.name;					
+					label.innerHTML = Orgvis.getValue(node.name);
 					
 					switch (node.data.nodeType) {
 					
@@ -1063,7 +1062,7 @@ var Orgvis = {
 					Orgvis.notify("Error","Could not load children posts for "+node.name, true,"error_rp_onDemand_"+postID);					
 					// Stops another API call being made
 					node.data.childrenAdded = true;
-				    $("div#"+node.id+" span.childLoader img").attr("src","../images/onDemandError.png");
+				    $("div#"+node.id+" span.childLoader img").attr("src","images/onDemandError.png");
 				},
 				success: function(json){
 					
@@ -1158,7 +1157,7 @@ var Orgvis = {
 
 					// Stops another API call being made
 					node.data.juniorStaffAdded = true;
-				    $("div#"+node.id+" span.childLoader img").attr("src","../images/onDemandError.png");
+				    $("div#"+node.id+" span.childLoader img").attr("src","images/onDemandError.png");
 				},
 				success: function(json){
 
@@ -1621,6 +1620,15 @@ var Orgvis = {
 		Orgvis.displayDataSources();
 
 	},
+    getValue: function(item) {
+      if (Array.isArray(item))
+        item = item[0]
+      if (typeof item == 'string')
+        return item
+      if (item._value != 'undefined')
+        return item._value
+      return 'Unknown value'
+    },
 	makeNode:function(item) {
 		
 		var node = {
@@ -1643,13 +1651,13 @@ var Orgvis = {
 		}
 		
 		if(typeof item.label != 'undefined'){
-			node.name = item.label[0];
+			node.name = this.getValue(item.label);
 		} else {
 			node.name = "?";
 		}
 
-		if(typeof item.grade != 'undefined' && typeof item.grade.label != 'undefined') {
-				node.data.grade = item.grade.label[0];
+		if(typeof item.grade != 'undefined') {
+				node.data.grade = this.getValue(item.grade[0].label);
 		}
 
 		if(typeof item.postIn != 'undefined'){
@@ -1658,7 +1666,7 @@ var Orgvis = {
 				if(item.postIn[a]._about.indexOf("/unit/") > 0){
 					if(typeof Orgvis.vars.unitList[Orgvis.getSlug(item.postIn[a]._about)] == 'undefined'){
 						Orgvis.vars.unitList[Orgvis.getSlug(item.postIn[a]._about)] = {
-							name:item.postIn[a].label[0],
+							name:this.getValue(item.postIn[a].label),
 							uri:item.postIn[a]._about,
 							count:1
 						};		
@@ -1693,28 +1701,28 @@ var Orgvis = {
 				var p = item.heldBy[a];
 							
 				if(typeof p.name != 'undefined'){
-					person.foafName = p.name;
+					person.foafName = this.getValue(p.name);
 				}
 				if(typeof p.phone != 'undefined'){
-					person.foafPhone = p.phone;
+					person.foafPhone = this.getValue(p.phone.label);
 				}
 				if(typeof p.email != 'undefined'){
-					person.foafMbox = p.email.label[0];
+					person.foafMbox = this.getValue(p.email.label);
 				}
 				if(typeof p.tenure != 'undefined' && typeof p.tenure.workingTime != 'undefined'){
 					person.workingTime = p.tenure.workingTime;
 				}
 				if(typeof p.profession != 'undefined' && typeof p.profession.prefLabel != 'undefined'){
-					person.profession = p.profession.prefLabel;
+					person.profession = this.getValue(p.profession.prefLabel);
 				}
 				if(typeof item._about != 'undefined'){
 					person.holdsPostURI = item._about;
 				}
 				if(typeof item.comment != 'undefined'){
-					person.comment = item.comment;
+					person.comment = this.getValue(item.comment);
 				}
 				if(typeof item.note != 'undefined'){
-					person.note = item.note;
+					person.note = this.getValue(item.note);
 				}
 								
 				node.data.totalWorkingTime += person.workingTime;
@@ -1768,7 +1776,7 @@ var Orgvis = {
 				log(node.name+" has more than one salary range");
 				for(var i in item.salaryRange){
 					try {
-						node.data.salaryRange.push(item.salaryRange[i].label[0]);	
+						node.data.salaryRange.push(this.getValue(item.salaryRange[i].label));
 					}
 					catch (err) {
 					
@@ -1790,7 +1798,7 @@ var Orgvis = {
 		//log(el);
 		
 		/*
-		el.label[0]		B1/BAND B1 Project Manager (Operational Delivery) in 
+		el.label[0]		B1/BAND B1 Project Manager   (Operational Delivery) in
 						Civil Service Capabilities Group reporting to post 93 FTE at 31/03/2011
 					
 		el.fullTimeEquivalent 						1 or 2
@@ -1821,13 +1829,13 @@ var Orgvis = {
 			};
 		
 		if(typeof el.label != 'undefined' && typeof el.label[0] != 'undefined'){
-			node.data.fullName = el.label[0];
+			node.data.fullName = this.getValue(el.label[0]);
 		}
 		
 		if(typeof el.atGrade != 'undefined'){		
 
 			if(typeof el.atGrade.prefLabel != 'undefined'){
-				node.data.grade = el.atGrade.prefLabel;
+				node.data.grade = this.getValue(el.atGrade.prefLabel);
 			} else{
 				node.data.grade = "Other";
 			}
@@ -1835,7 +1843,7 @@ var Orgvis = {
 			if(typeof el.atGrade.payband != 'undefined'){
 
 				if(typeof el.atGrade.payband.prefLabel != 'undefined'){
-					node.data.payband = el.atGrade.payband.prefLabel;
+					node.data.payband = this.getValue(el.atGrade.payband.prefLabel);
 				} else {
 					node.data.payband = "No payband";
 				}
@@ -1844,8 +1852,8 @@ var Orgvis = {
 
 					var salaryRangeLabel, salaryRangeValue;
 			  								
-					if(typeof el.atGrade.payband.salaryRange.label != 'undefined'){
-						salaryRangeLabel = el.atGrade.payband.salaryRange.label[0];
+					if(typeof el.atGrade.payband.salaryRange[0].label != 'undefined'){
+						salaryRangeLabel = this.getValue(el.atGrade.payband.salaryRange[0].label);
 			  			salaryRangeValue = salaryRangeLabel.replace(/�/g,'');
 			  			salaryRangeValue = salaryRangeValue.split(" - ");
 			  			salaryRangeValue = salaryRangeValue[0];
@@ -1876,13 +1884,8 @@ var Orgvis = {
 		}
 		
 		if(typeof el.withJob != 'undefined'){
-			if(typeof el.withJob.prefLabel != 'string'){
-				node.name = el.withJob.prefLabel[0];
-				node.data.job = el.withJob.prefLabel[0];
-			} else {
-				node.name = el.withJob.prefLabel;
-				node.data.job = el.withJob.prefLabel;
-			}
+			node.name = this.getValue(el.withJob.prefLabel);
+			node.data.job = this.getValue(el.withJob.prefLabel);
 		} else {
 			node.name = "Job not disclosed";
 			node.data.job = "Job not disclosed";
@@ -1899,7 +1902,7 @@ var Orgvis = {
 		}
 		
 		if(typeof el.inUnit != 'undefined' && typeof el.inUnit.label != 'undefined' && typeof el.inUnit._about != 'undefined'){	
-			node.data.unit.label = el.inUnit.label[0];
+			node.data.unit.label = this.getValue(el.inUnit.label);
 			node.data.unit.uri = el.inUnit._about;			
 		} else {
 			node.data.unit.label = "Other";
@@ -1952,14 +1955,11 @@ var Orgvis = {
 		
 		return node;
 	},
-	makeJuniorPostGroup:function(group,prop){
-        if(Array.isArray(group)){
-            group = group[0];
-        }
-
-        var node = {
+	makeJuniorPostGroup:function(groupName,prop){
+		
+		var node = {			
 			id:$.generateId(),
-			name:group._value,
+			name:groupName,
 			data:{
 				fteTotal:0,
 				nodeType:'jp_group',
@@ -1970,7 +1970,10 @@ var Orgvis = {
 			children:[]	            		
 		};	
 
-
+		if(typeof groupName != 'string'){
+			node.name = groupName[0];
+		}
+				
 		if(Orgvis.vars.jpColourCounter == Orgvis.vars.colours.length-1){
 			Orgvis.vars.jpColourCounter = 0;
 		} else {
@@ -2090,7 +2093,7 @@ var Orgvis = {
 			var pSlug,gSlug,uSlug;
 						
 			if(typeof items[i].withProfession != 'undefined'){
-                pSlug = Orgvis.getSlug(items[i].withProfession._about)
+				pSlug = Orgvis.getSlug(items[i].withProfession._about);
 			} else {
 				pSlug = "other";
 			}
@@ -2124,6 +2127,7 @@ var Orgvis = {
 				byGrade[gSlug].data.fteTotal += items[i].fullTimeEquivalent;
 			} else {
 			  	
+			  	var salaryRange;
 			  	if(typeof items[i].atGrade.payband != 'undefined' && typeof items[i].atGrade.payband.salaryRange != 'undefined'){
 					if(typeof items[i].atGrade.payband.salaryRange.label != 'undefined'){
 			  		salaryRange = addCommas(items[i].atGrade.payband.salaryRange.label[0]);
@@ -2356,7 +2360,7 @@ var Orgvis = {
 		for(var j=postIn.length;j--;){
 			if(postIn[j]._about.indexOf("/unit/") >= 0){
 				tempUnitID = Orgvis.getSlug(postIn[j]._about);
-				tempUnitLabel = postIn[j].label[0];
+				tempUnitLabel = this.getValue(postIn[j].label);
 				postUnit = postIn[j]._about;
 			}
 		}
@@ -2408,7 +2412,7 @@ var Orgvis = {
 					if(nd.gotStats) {
 						html += '<p class="salaryReports"><span>Combined salary of reporting posts</span><span class="value">'+nd.stats.salaryCostOfReports.formatted+'</span><a class="data" target="_blank" href="http://'+Orgvis.vars.apiBase+'/doc/'+Orgvis.vars.global_typeOfOrg+'/'+Orgvis.vars.global_postOrg+'/post/'+tempID+'/statistics" value="'+nd.stats.salaryCostOfReports.value+'">Data</a><span class="date">'+nd.stats.date.formatted+'</span>';	
 					} else {
-						html += '<p class="salaryReports"><span>Combined salary of reporting posts </span><span class="value">Checking...</span><img class="salaryReports" width="14" height="14" src="../images/loading_white.gif"></p>';
+						html += '<p class="salaryReports"><span>Combined salary of reporting posts </span><span class="value">Checking...</span><img class="salaryReports" width="14" height="14" src="images/loading_white.gif"></p>';
 					}	
 				}			
 				
@@ -2490,19 +2494,19 @@ var Orgvis = {
 		html += '<div class="content ui-accordion-content ui-helper-reset ui-widget-content ui-corner-bottom ui-corner-top">';
 
 		if(typeof nd.job != 'undefined'){
-			html += '<p class="profession"><span>Profession</span><span class="value">'+nd.job+'</span></p>';
+			html += '<p class="profession"><span>Profession</span><span class="value">'+this.getValue(nd.job)+'</span></p>';
 		}
 		
 		if(typeof nd.profession != 'undefined'){
-			html += '<p class="profession"><span>Profession</span><span class="value">'+nd.profession+'</span></p>';
+			html += '<p class="profession"><span>Profession</span><span class="value">'+this.getValue(nd.profession)+'</span></p>';
 		}		
 		
 		html += '<p class="fte"><span>Full Time Equivalent</span><span class="value">'+nd.fullTimeEquivalent+'</span></p>';
-		html += '<p class="grade"><span>Grade</span><span class="value">'+nd.grade+'</span></p>';
-		html += '<p class="payband"><span>Payband</span><span class="value">'+nd.payband+'</span></p>';
-		html += '<p class="paybandRange"><span>Payband Salary Range</span><span class="value">'+nd.salaryRange+'</span></p>';
-		html += '<p class="reportsTo"><span>Reports To</span><span class="value">'+nd.reportingTo.label+'</span></p>';
-		html += '<p class="unit"><span>Unit</span><span class="value">'+nd.unit.label+'</span></p>';
+		html += '<p class="grade"><span>Grade</span><span class="value">'+this.getValue(nd.grade)+'</span></p>';
+		html += '<p class="payband"><span>Payband</span><span class="value">'+this.getValue(nd.payband)+'</span></p>';
+		html += '<p class="paybandRange"><span>Payband Salary Range</span><span class="value">'+this.getValue(nd.salaryRange)+'</span></p>';
+		html += '<p class="reportsTo"><span>Reports To</span><span class="value">'+this.getValue(nd.reportingTo.label)+'</span></p>';
+		html += '<p class="unit"><span>Unit</span><span class="value">'+this.getValue(nd.unit.label)+'</span></p>';
 		
 		html += '</div>'; // end content
 		html += '</div>'; // end panel
@@ -3009,7 +3013,7 @@ $.myJSONP = function(s,callName,n) {
 		
 		Orgvis.notify("Error","Could not load "+node.name+"'s "+callName, true,"error_handler_"+postID);
 		
-		$("div#"+node.id+" span.childLoader img").attr("src","../images/onDemandError.png");
+		$("div#"+node.id+" span.childLoader img").attr("src","images/onDemandError.png");
 		var json = {
 				result:{
 					_about:s.url,
