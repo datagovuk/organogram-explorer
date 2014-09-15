@@ -1952,11 +1952,14 @@ var Orgvis = {
 		
 		return node;
 	},
-	makeJuniorPostGroup:function(groupName,prop){
-		
-		var node = {			
+	makeJuniorPostGroup:function(group,prop){
+        if(Array.isArray(group)){
+            group = group[0];
+        }
+
+        var node = {
 			id:$.generateId(),
-			name:groupName,
+			name:group._value,
 			data:{
 				fteTotal:0,
 				nodeType:'jp_group',
@@ -1967,10 +1970,7 @@ var Orgvis = {
 			children:[]	            		
 		};	
 
-		if(typeof groupName != 'string'){
-			node.name = groupName[0];
-		}
-				
+
 		if(Orgvis.vars.jpColourCounter == Orgvis.vars.colours.length-1){
 			Orgvis.vars.jpColourCounter = 0;
 		} else {
@@ -2090,7 +2090,7 @@ var Orgvis = {
 			var pSlug,gSlug,uSlug;
 						
 			if(typeof items[i].withProfession != 'undefined'){
-				pSlug = Orgvis.getSlug(items[i].withProfession);
+                pSlug = Orgvis.getSlug(items[i].withProfession._about)
 			} else {
 				pSlug = "other";
 			}
