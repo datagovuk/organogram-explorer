@@ -57,7 +57,7 @@
 <![endif]-->
 
 <![if !IE]>
-  <body onload="Orgvis.init('<?php print $_GET['dept'];?>','<?php print $_GET['pubbod'];?>','<?php print $_GET['post'];?>',false,'<?php print $_GET['preview'];?>', '<?php print $_GET['old']?>', '/dgud7/organogram-explorer/index.php');">
+  <body onload="Orgvis.init('<?php print $_GET['dept'];?>','<?php print $_GET['pubbod'];?>','<?php print $_GET['post'];?>',false,'<?php print $_GET['preview'];?>', '<?php print $_GET['old']?>', '<?php print $_SERVER['PHP_SELF']?>');">
 <![endif]> 
 
 
