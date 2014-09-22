@@ -57,7 +57,7 @@
 <![endif]-->
 
 <![if !IE]>
-  <body onload="Orgvis.init('<?php print $_GET['dept'];?>','<?php print $_GET['pubbod'];?>','<?php print $_GET['post'];?>',false,'<?php print $_GET['preview'];?>', '<?php print $_GET['old']?>');">
+  <body onload="Orgvis.init('<?php print $_GET['dept'];?>','<?php print $_GET['pubbod'];?>','<?php print $_GET['post'];?>',false,'<?php print $_GET['preview'];?>', '<?php print $_GET['old']?>', '/dgud7/organogram-explorer/index.php');">
 <![endif]> 
 
 
@@ -130,7 +130,13 @@
                 <button id="nav_right">Right</button>
             </div>
 		</div>
-				
+  <div class="slider" style="visibility: visible;">
+    <p>
+      <label for="versions" style="border: 0; color: #FFFFFF; font-weight: bold; background: #9A51C6">Version:</label>
+      <span id="versions" style="border: 0; color: #FFFFFF; font-weight: bold; background: #9A51C6">30/09/2013</span>
+    </p>
+    <div id="slider" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all"><a href="#" class="ui-slider-handle ui-state-default ui-corner-all" style="left: 100%;"></a></div>
+  </div>
 	<div id="apiCalls">
 		<p class="label">Data sources</p>
 		<!-- information about API calls goes here -->
